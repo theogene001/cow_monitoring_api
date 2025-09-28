@@ -12,7 +12,6 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
-app.use('/api/farmers', require('./routes/farmers'));
 app.use('/api/cows', require('./routes/cows'));
 app.use('/api/collars', require('./routes/collars'));
 app.use('/api/sensors', require('./routes/sensors'));
@@ -27,6 +26,16 @@ app.get('/api/health/db', async (req, res) => {
     res.json({ database: 'up', result: rows[0] });
   } catch (err) {
     res.status(500).json({ database: 'down', error: err.message });
+  }
+});
+
+// Aggregate health (app + DB) for Render
+app.get('/api/health', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT 1 AS ok');
+    return res.json({ app: 'up', database: 'up', result: rows[0] });
+  } catch (err) {
+    return res.status(500).json({ app: 'up', database: 'down', error: err.message });
   }
 });
 
