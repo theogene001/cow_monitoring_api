@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const pool = require('./config/database');
 
 const app = express();
 
@@ -16,8 +17,18 @@ app.use('/api/cows', require('./routes/cows'));
 app.use('/api/collars', require('./routes/collars'));
 app.use('/api/sensors', require('./routes/sensors'));
 app.use('/api/sensor-data', require('./routes/sensorData'));
-    app.use('/api/health-records', require('./routes/healthRecords'));
-    app.use('/api/alerts', require('./routes/alerts'));
+app.use('/api/health-records', require('./routes/healthRecords'));
+app.use('/api/alerts', require('./routes/alerts'));
+
+// DB health check
+app.get('/api/health/db', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT 1 AS ok');
+    res.json({ database: 'up', result: rows[0] });
+  } catch (err) {
+    res.status(500).json({ database: 'down', error: err.message });
+  }
+});
 
 // Basic route
 app.get('/', (req, res) => {

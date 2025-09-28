@@ -10,7 +10,7 @@ router.post('/register', validateUser, async (req, res) => {
     const { USERNAME, EMAIL, PASSWORD, ROLE } = req.body;
     
     const [existingUsers] = await pool.execute(
-      'SELECT USER_ID FROM USERS WHERE EMAIL = ? OR USERNAME = ?',
+      'SELECT USER_ID FROM users WHERE EMAIL = ? OR USERNAME = ?',
       [EMAIL, USERNAME]
     );
 
@@ -22,7 +22,7 @@ router.post('/register', validateUser, async (req, res) => {
     const passwordHash = await bcrypt.hash(PASSWORD, saltRounds);
 
     const [result] = await pool.execute(
-      'INSERT INTO USERS (USERNAME, EMAIL, PASSWORD_HASH, ROLE) VALUES (?, ?, ?, ?)',
+      'INSERT INTO users (USERNAME, EMAIL, PASSWORD_HASH, ROLE) VALUES (?, ?, ?, ?)',
       [USERNAME, EMAIL, passwordHash, ROLE || 'FARMER']
     );
 
@@ -56,7 +56,7 @@ router.post('/login', async (req, res) => {
     }
 
     const [users] = await pool.execute(
-      'SELECT USER_ID, USERNAME, EMAIL, PASSWORD_HASH, ROLE FROM USERS WHERE EMAIL = ?',
+      'SELECT USER_ID, USERNAME, EMAIL, PASSWORD_HASH, ROLE FROM users WHERE EMAIL = ?',
       [EMAIL]
     );
 
